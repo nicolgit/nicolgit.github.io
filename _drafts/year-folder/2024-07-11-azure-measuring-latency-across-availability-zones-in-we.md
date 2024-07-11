@@ -80,16 +80,16 @@ In this scenario I moved to a more classic configuration: I eliminated peering a
 
 Here the measures from `spoke01-az-01` (availability zone 1) to machines in another virtual network via an Azure Virtual Network Gateway in the Hub Network.
 
-| Command | Av Zone |  Snt |  Last |  Avg | Best | Wrst | StDev
-|---|--------|------|-------|------|------|------|------|
-| `mtr 10.13.2.5` | 1  |  47 |   4.2 |  **3.4** |  1.6 | 24.4 |  4.2 |
-| `mtr 10.13.2.6` | 2  |  35 |   2.9 |  **4.3** |  2.8 | 12.3 |  2.6 |
-| `mtr 10.13.2.7` | 3  |  36 |   3.4 |  **4.5** |  2.8 | 15.7 |  3.1 |
+| commamd | Availability Zone |  Latency (usec) |  
+|---------|-------------------|-----------------|
+`latte -c -a 10.13.2.5:80 -i 60000` | 1  | 887.56  |
+`latte -c -a 10.13.2.6:80 -i 60000` | 2  | 957.46  |
+`latte -c -a 10.13.2.7:80 -i 60000` | 3  | 2124.09 |
 
 Takeaways
 
-* Latency increased up to **3.4/4.5ms**, because each packet have to cross 2 peerings and a virtual appliace (Azure Virtual Network Gateway)
-* **Staying in the same availability zone also have a positive impact on latency**: an average of +1ms in cross availability zone topology is not huge in se, but is a relative increase quite high (+50%)
+* Latency increased up to **0.8/2.1ms** because each packet has to cross 2 peerings and a virtual appliance (Azure Virtual Network Gateway).
+* Staying in the same availability zone still has a positive impact on latency. Communication between AZ1 and AZ2 increases latency by a small amount (0.1ms), but in the case of AZ3, latency reaches just over 2ms. However, we are still within the limits stated by Microsoft, as the guaranteed 2ms latency does not account for the presence of a virtual appliance in between.
 
 # Scenario 4 - two virtual networks in H&S configuration with an Azure Firewall in between
 
@@ -99,26 +99,24 @@ In this last scenario I implemented the [reference architecture described in the
 
 Here the measures from `spoke01-az-01` (availability zone 1) to machines in another virtual network and different availability zones, via Azure Firewall in the Hub Network.
 
-| Command | Av Zone |  Snt |  Last |  Avg | Best | Wrst | StDev |
-|---|--------|------|-------|------|------|------|------|
-| `mtr 10.13.2.5` | 1  |  58   | 2.4  | **2.3**  | 1.8  | 5.7  | 0.6 |
-| `mtr 10.13.2.6` | 2  |  34   | 3.4  | **3.1**  | 2.6  | 4.3  | 0.3 |
-| `mtr 10.13.2.7` | 3  |  30   | 3.7  | **3.4**  | 2.9  | 3.9  | 0.3 |
+| commamd | Availability Zone |  Latency (usec) |  
+|---------|-------------------|-----------------|
+`latte -c -a 10.13.2.5:80 -i 60000` | 1  | 2418.44 |
+`latte -c -a 10.13.2.6:80 -i 60000` | 2  | 2605.39  |
+`latte -c -a 10.13.2.7:80 -i 60000` | 3  | 1575.93  |
 
 Takeaways
 
-* Latency is far better than an Azure Virtual Network Gateway with Azure Firewall in between
-* **When source and destination are in the same availability zone it has almost the same as for a simple peering**
-* When source and destination are **in different availabity zones, latency grows up to 3.1/3.4ms**
+* The latency with the Azure Firewall is comparable to that of the Azure Virtual Network Gateway in between.
+* There are still situations where the latency is below 2ms or slightly higher (2.4/2.6ms).
+* The transit time through the firewall can also vary depending on the capabilities enabled on the server and the number or policy rules that the traffic crosses.
 
 # Final thoughts
 
-* Where possible use **always Proximity Placement Groups** to have sub 2ms latency
-* Traffic between zones is confirmed to be **on the order of 2ms**
-* Peerings and hub-and-spoke **have no real impac**t if a Firewall is used in the middle
-* I would avoid to use a VPN Gateway for **cross spokes communications**
+* Whenever possible, **always use Proximity Placement Groups** to achieve lower latency.
+* Traffic between zones has been consistently measured to be **below 2ms**.
+* Peerings have minimal impact on latency.
+* The hub-and-spoke architecture can have an impact on latency, but by using either a VPN Gateway or, preferably, an Azure Firewall as a virtual appliance, the latency remains almost within the 2ms threshold.
 
 More information
 * Test Network Latency on Azure VM: https://learn.microsoft.com/en-us/azure/virtual-network/virtual-network-test-latency?tabs=windows 
-* Latte repo: https://github.com/microsoft/latte
-* Azure Availability Zone explained: https://learn.microsoft.com/en-us/azure/reliability/availability-zones-overview?tabs=azure-cli 
