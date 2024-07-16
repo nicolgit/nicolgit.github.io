@@ -13,7 +13,7 @@ header:
 
 [Azure availability zones](https://docs.microsoft.com/en-us/azure/availability-zones/az-overview) are physically separate locations within each Azure region that are tolerant to local failures. **Azure availability zones are connected by a high-performance network with a round-trip latency of less than 2ms**. 
 
-in Azure, each data center is assigned to a physical (availability) zone. Physical zones are mapped to logical (availability) zones in your Azure subscription. You can design resilient solutions by using Azure services that use availability zones. Co-locate your compute, storage, networking, and data resources across an availability zone, and replicate this arrangement in other availability zones.
+In Azure, each data center is assigned to a physical (availability) zone. Physical zones are mapped to logical (availability) zones in your Azure subscription. You can design resilient solutions by using Azure services that use availability zones. 
 
 A [proximity placement group](https://azure.microsoft.com/en-us/blog/announcing-the-general-availability-of-proximity-placement-groups/) is an Azure Virtual Machine logical grouping capability that you can use to decrease the inter-VM network latency associated with your applications. When the VMs are deployed within the same proximity placement group, they are physically located as close as possible to each other.
 
@@ -119,4 +119,4 @@ Takeaways
 * The hub-and-spoke architecture can have an impact on latency, but by using either a VPN Gateway or, preferably, an Azure Firewall as a virtual appliance, the latency remains almost within the 2ms threshold.
 
 More information
-* Test Network Latency on Azure VM: https://learn.microsoft.com/en-us/azure/virtual-network/virtual-network-test-latency?tabs=windows 
+* Test Network Latency on Azure VM: <https://learn.microsoft.com/en-us/azure/virtual-network/virtual-network-test-latency?tabs=windows>
