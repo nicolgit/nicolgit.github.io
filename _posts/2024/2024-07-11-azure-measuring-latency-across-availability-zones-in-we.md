@@ -38,14 +38,14 @@ To measure latency, I used [Latte](https://github.com/microsoft/latte), a Window
 
 In this scenario I have a calling machine in one availability zone and 3 additional machines each in a different availability zone. In availability zone 1 I have also placed both machines in the same proximity placement group to have the best possible latency, as shown below.
 
-![same network](../../assets/post/2022/latency-scenario-1.png)
+![same network](../../assets/post/2024/latency/latency-scenario-1.png)
 
 Here the measures from `spoke01-az-01` (Availability Zone 1).
 
 | commamd | Availability Zone |  Latency (usec) |  
 |---------|-------------------|-----------------|
 `latte -c -a 10.13.1.6:80 -i 60000` | 1  | **65.15**    |
-`latte -c -a 10.13.1.7:80 -i 60000` | 2  | **119.87**   uhm|
+`latte -c -a 10.13.1.7:80 -i 60000` | 2  | **119.87**   |
 `latte -c -a 10.13.1.8:80 -i 60000` | 3  | **1199.54**  |
 
 Takeaways:
@@ -58,7 +58,7 @@ Takeaways:
 
 In this scenario I have measured the impact of a network peering. I have created 3 more machines, in 3 availability zones, on another network, in peering.
 
-![peering](../../assets/post/2022/latency-scenario-2.png)
+![peering](../../assets/post/2024/latency/latency-scenario-2.png)
 
 Here the measures from `spoke01-az-01` (availability zone 1) to machines in another virtual network in peering.
 
@@ -76,7 +76,7 @@ Takeaways:
 
 In this scenario I moved to a more classic configuration: I eliminated peering and routed traffic through a central hub and an Azure Virtual Network Gateway.
 
-![hub-and-spoke](../../assets/post/2022/latency-scenario-3-4.png)
+![hub-and-spoke](../../assets/post/2024/latency/latency-scenario-3.png)
 
 Here the measures from `spoke01-az-01` (availability zone 1) to machines in another virtual network via an Azure Virtual Network Gateway in the Hub Network.
 
@@ -95,7 +95,7 @@ Takeaways
 
 In this last scenario I implemented the [reference architecture described in the cloud adoption framework](https://docs.microsoft.com/en-us/azure/architecture/reference-architectures/hybrid-networking/hub-spoke), that is a hub and spoke, with an Azure Firewall to control all the traffic. 
 
-![hub and spoke](../../assets/post/2022/latency-scenario-3-4.png)
+![hub and spoke](../../assets/post/2024/latency/latency-scenario-4.png)
 
 Here the measures from `spoke01-az-01` (availability zone 1) to machines in another virtual network and different availability zones, via Azure Firewall in the Hub Network.
 
