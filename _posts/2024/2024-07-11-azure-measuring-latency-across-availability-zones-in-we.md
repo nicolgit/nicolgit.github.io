@@ -42,7 +42,7 @@ In this scenario I have a calling machine in one availability zone and 3 additio
 
 Here the measures from `spoke01-az-01` (Availability Zone 1).
 
-| commamd | Availability Zone |  Latency (usec) |  
+| Command | Availability Zone |  Latency (usec) |  
 |---------|-------------------|-----------------|
 `latte -c -a 10.13.1.6:80 -i 60000` | 1  | **65.15**    |
 `latte -c -a 10.13.1.7:80 -i 60000` | 2  | **119.87**   |
@@ -62,7 +62,7 @@ In this scenario I have measured the impact of a network peering. I have created
 
 Here the measures from `spoke01-az-01` (availability zone 1) to machines in another virtual network in peering.
 
-| commamd | Availability Zone |  Latency (usec) |  
+| Command | Availability Zone |  Latency (usec) |  
 |---------|-------------------|-----------------|
 `latte -c -a 10.13.2.5:80 -i 60000` | 1  | **57.92**   |
 `latte -c -a 10.13.2.6:80 -i 60000` | 2  | **112.22**  |
@@ -80,7 +80,7 @@ In this scenario I moved to a more classic configuration: I eliminated peering a
 
 Here the measures from `spoke01-az-01` (availability zone 1) to machines in another virtual network via an Azure Virtual Network Gateway in the Hub Network.
 
-| commamd | Availability Zone |  Latency (usec) |  
+| Command | Availability Zone |  Latency (usec) |  
 |---------|-------------------|-----------------|
 `latte -c -a 10.13.2.5:80 -i 60000` | 1  | 887.56  |
 `latte -c -a 10.13.2.6:80 -i 60000` | 2  | 957.46  |
@@ -99,7 +99,7 @@ In this last scenario I implemented the [reference architecture described in the
 
 Here the measures from `spoke01-az-01` (availability zone 1) to machines in another virtual network and different availability zones, via Azure Firewall in the Hub Network.
 
-| commamd | Availability Zone |  Latency (usec) |  
+| Command | Availability Zone |  Latency (usec) |  
 |---------|-------------------|-----------------|
 `latte -c -a 10.13.2.5:80 -i 60000` | 1  | 2418.44 |
 `latte -c -a 10.13.2.6:80 -i 60000` | 2  | 2605.39  |
@@ -118,5 +118,3 @@ Takeaways
 * Peerings have minimal impact on latency.
 * The hub-and-spoke architecture can have an impact on latency, but by using either a VPN Gateway or, preferably, an Azure Firewall as a virtual appliance, the latency remains almost within the 2ms threshold.
 
-More information
-* Test Network Latency on Azure VM: <https://learn.microsoft.com/en-us/azure/virtual-network/virtual-network-test-latency?tabs=windows>
