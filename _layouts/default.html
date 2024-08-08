@@ -10,11 +10,9 @@
   </head>
 
   <body class="layout--{{ page.layout | default: layout.layout }}{% if page.classes or layout.classes %}{{ page.classes | default: layout.classes | join: ' ' | prepend: ' ' }}{% endif %}" dir="{% if site.rtl %}rtl{% else %}ltr{% endif %}">
-X
     {% include_cached skip-links.html %}
-Y
     {% include_cached masthead.html %}
-Z
+
     <div class="initial-content">
       {{ content }}
       {% include after-content.html %}
