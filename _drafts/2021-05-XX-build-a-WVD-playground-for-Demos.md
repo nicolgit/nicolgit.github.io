@@ -6,7 +6,7 @@ comments: false
 tags: [Azure, Windows Virtual Desktop, Tutorial]
 ---
 
-TUTTO DA RISCRIVERE This sample demonstrates how to deploy, from GitHub, an Angular single page application (SPA) to Azure App Service running Node.js on Linux. A continuous delivery/continuous integration pipeline will be also put in place with a GitHub Action.
+TUTTO DA RISCRIVERE!!! This sample demonstrates how to deploy, from GitHub, an Angular single page application (SPA) to Azure App Service running Node.js on Linux. A continuous delivery/continuous integration pipeline will be also put in place with a GitHub Action.
 
 This sample demonstrates how to:
 
