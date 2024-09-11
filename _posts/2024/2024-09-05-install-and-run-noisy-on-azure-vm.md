@@ -11,7 +11,7 @@ header:
 
 In this blog post, I show a PowerShell script that is designed to facilitate the installation of Python and Git, and subsequently download the repository of Noisy from GitHub, initiating it with the default configuration.
 
-> [Noisy](https://github.com/1tayH/noisy) is an elegant yet robust Python script that is programmed to generate arbitrary HTTP/DNS traffic. I am the author of this script, and
+> [Noisy](https://github.com/1tayH/noisy) is an elegant yet robust Python script that is programmed to generate arbitrary HTTP/DNS traffic.
 
 I primarily utilize it on my 'hub-and-spoke playground' to generate simulated traffic. This facilitates the exploration and manipulation of Azure firewall configurations.
 
