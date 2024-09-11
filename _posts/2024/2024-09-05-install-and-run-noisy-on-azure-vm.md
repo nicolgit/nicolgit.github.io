@@ -43,9 +43,6 @@ $gitSetupFile = "Git-" + $gitVersion +"-64-bit.exe"
 $gitDownloadUri = "https://github.com/git-for-windows/git/releases/download/v" + $gitVersion + ".windows.1/" + $gitSetupFile
 Invoke-WebRequest -UseBasicParsing -Uri $gitDownloadUri -OutFile $gitSetupFile
 
-$installGitCommand = '.\' + $gitSetupFile+ ' /SILENT'
-Invoke-Expression $installGitCommand 
-
 $installGitCommand = '.\' + $gitSetupFile
 Start-Process -wait $installGitCommand -ArgumentList @('/SILENT')
 
