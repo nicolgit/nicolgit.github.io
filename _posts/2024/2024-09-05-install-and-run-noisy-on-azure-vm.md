@@ -1,7 +1,7 @@
 ---
 title: How install and run noisy on an Azure VM
 date: 2024-09-04 10:00
-tags: [Azure, networking, hub-and-spoke, noisy, powershell, python, git, script]
+tags: [Azure, networking, hub-and-spoke, noisy, powershell, python, git, script, windows, linux, shell]
 excerpt: "a PowerShell script that facilitates the installation of Python and Git, subsequently download the repository of Noisy from GitHub and run it with the default configuration"
 
 header:
@@ -17,7 +17,7 @@ I primarily utilize it on my 'hub-and-spoke playground' to generate simulated tr
 
 > the [hub-and-spoke playground](https://github.com/nicolgit/hub-and-spoke-playground) is instead a composite collection of BICEP/ARM templates. These templates are designed to be deployed on Azure, forming a hub and spoke network topology that is in alignment with the Microsoft Enterprise scale landing zone reference architecture. This setup serves as an experimental playground for testing and studying.
 
-The following steps need to be executed from an administrative PowerShell terminal:
+The following steps need to be executed from an administrative PowerShell terminal if the machine runs Windows:
 
 ```powershell
 #
@@ -61,3 +61,17 @@ cd noisy
 python noisy.py --config config.json
 
 ```
+
+If you run an Ubuntu machine, you already have `python` and `git` installed, so only steps 3 and 4 are required, as shown below:
+
+```sh
+sudo apt update
+sudo apt upgrade
+
+git clone https://github.com/1tayH/noisy.git
+cd noisy
+
+python3 noisy.py --config config.json
+
+```
+
