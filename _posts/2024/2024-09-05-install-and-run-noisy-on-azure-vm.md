@@ -1,15 +1,15 @@
 ---
-title: How install and run noisy on an Azure VM
+title: How to install and run noisy on an Azure VM
 date: 2024-09-04 10:00
 tags: [Azure, networking, hub-and-spoke, noisy, powershell, python, git, script, windows, linux, shell]
-excerpt: "a PowerShell script that facilitates the installation of Python and Git, subsequently download the repository of Noisy from GitHub and run it with the default configuration"
+excerpt: "a PowerShell and shell script that facilitates the installation of Python and Git, subsequently download the repository of Noisy from GitHub and run it with the default configuration"
 
 header:
   overlay_image: https://live.staticflickr.com/65535/52755090506_6cf0808a3c_h.jpg
   caption: "Photo credit: [**nicola since 1972**](https://www.flickr.com/photos/15216811@N06/52755090506)"
 ---
 
-In this blog post, I show a PowerShell script that is designed to facilitate the installation of Python and Git, and subsequently download the repository of Noisy from GitHub, initiating it with the default configuration.
+In this blog post, I show a a couple of scripts that are designed to facilitate the installation of Python and Git and subsequently download the repository of Noisy from GitHub, initiating it with the default configuration, on both Windows and Linux VMs.
 
 > [Noisy](https://github.com/1tayH/noisy) is an elegant yet robust Python script that is programmed to generate arbitrary HTTP/DNS traffic.
 
