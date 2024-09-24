@@ -19,7 +19,7 @@ This event is disabled by default, but it [can be enabled via GPO](https://learn
  
 ![local-security-policy](../../assets/post/2024/local-security-policy.png)
 
-The XPATH query, which can be used as a filter in the event to recognize this event, is as follows
+The XPATH query, which can be used as a filter in the Window Event Viewer, is the following
 
 ```xml
 <QueryList>
