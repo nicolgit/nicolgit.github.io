@@ -15,7 +15,7 @@ The event to monitor is [4688(S): A new process has been created](https://learn.
    
 This event generates every time a new process starts. To recognize the "run-as-administrator" use, it is necessary to check the value of the `Token Elevation Type` field, in particular, it must contain `%%1937`
 
-This event is disabled by default, but it can be enabled via GPO https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/component-updates/command-line-process-auditing for domain machines or using the local security policy for stand alone servers (`Local Security Policy` > `Local Policy` > `Audit Policy` > `Audit Process Tracking`)
+This event is disabled by default, but it [can be enabled via GPO](https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/component-updates/command-line-process-auditing)  for domain machines or using the local security policy for stand alone servers (`Local Security Policy` > `Local Policy` > `Audit Policy` > `Audit Process Tracking`)
  
 ![local-security-policy](../../assets/post/2024/local-security-policy.png)
 
@@ -36,8 +36,8 @@ The XPATH query, which can be used as a filter in the event to recognize this ev
 
 The same query can also be used in a Data Collection Rule in Azure:
 
-* Data Source: Windows Event log
-* Query Type: Custom
+* Data Source: `Windows Event log`
+* Query Type: `Custom`
 * Xpath Query: `[EventData[Data[@Name='TokenElevationType']and(Data='%%1937')]]`
   
 As indicated in the official documentation below:
