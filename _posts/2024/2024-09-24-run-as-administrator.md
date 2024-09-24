@@ -1,6 +1,6 @@
 ---
 title: How to intercept the "run as administrator" event
-date: 2024-09-24 10:00
+date: 2024-09-24 06:00
 tags: [Azure, virtual machine, log analytics, windows, event, event viewer]
 excerpt: "in this blog post I show how to intercept the run-as-administrator on a windows machine"
 
