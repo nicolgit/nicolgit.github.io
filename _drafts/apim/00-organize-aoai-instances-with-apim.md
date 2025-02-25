@@ -1,8 +1,8 @@
 ---
-title: Distribute Azure Open AI deployment in enterprise using Azure API Management service
+title: Open AI recipes for Azure API Management Service
 date: 2025-01-01 10:00
 tags: [Azure, networking, API manager, OpenAI ]
-excerpt: ""
+excerpt: "xxx"
 
 header:
   overlay_image: https://live.staticflickr.com/65535/52755090506_6cf0808a3c_h.jpg
@@ -43,7 +43,7 @@ come mostrato nello schema seguente:
 Go to API Management services > `nicold-apim` > Backends > Add
 * Name: `apim-001`
 * Backend hosting type: Custom URL
-* Runtime URL: https://nicold-aoai-001.openai.azure.com 
+* Runtime URL: https://nicold-aoai-001.openai.azure.com/openai
 * Authorization credential
   * Headers
     * Name: `api-key`
@@ -53,7 +53,7 @@ Go to API Management services > `nicold-apim` > Backends > Add
 Go to API Management services > `nicold-apim` > Backends > Add
 * Name: `apim-002`
 * Backend hosting type: Custom URL
-* Runtime URL: https://nicold-aoai-002.openai.azure.com 
+* Runtime URL: https://nicold-aoai-002.openai.azure.com/openai
 * Authorization credential
   * Headers
     * Name: `api-key`
@@ -63,7 +63,35 @@ Go to API Management services > `nicold-apim` > Backends > Add
 here the result:
 ![backend resorces added](../../assets/post/2025/apim-aoai/01-add-backend-resources.png)
 
-# 02 
+# 02 show apim-001 endpoint as root API
+
+Go to Azure Portal > API Management Sevices > `nicold-apim` > API > Create form Azure Resources > Azure OpenAI Service
+* Azure OpenAI instance: `nicold-aoai-001`
+* API Version: `2024-02-01`
+* Display name: `/`
+* name: `root-api`
+* click [review and create] and then [create]
+
+This creates a frontend but ALSO a backend. To use the previously created backend go to: 
+
+API Management Services > `nicold-apim` > APIs > All APIs > `/` > Design > Backend > Policies > Base
+
+and change `backend-id="openai-root-openai-endpoint"` to `backend-id="apim-001"`, then save it.
+
+To test this endpoint go to: API Management Services > `nicold-apim` > APIs > All APIs > `/` > Test > `Creates a completion for the chat message` 
+* deployment-id: `gpt4o-001`
+* api-version: `2024-02-01` (same used above)
+* request body: `{"messages": [{ "role": "system","content": "You are a helpful assistant."},{ "role": "user", "content": "Tell me a joke!"} ]}`
+* click: [SEND]
+
+
+
+
+
+
+
+
+----------------------------
 
 
 - esporre una API attraverso policy
