@@ -32,13 +32,13 @@ in questi post ci focalizzeremo sulla configurazione delle policy e di implement
 Il laboratorio su cui lavoró prevede le seguenti risorse:
 
 * Azure API Management service (developer SKU) enterpriseapim
-* 2 x Azure OpenAI service (S0 SKU) apimaoai01 and apimaoai02
+* 2 x Azure OpenAI service (S0 SKU) `apimaoai01` and `apimaoai02`
 
 come mostrato nello schema seguente:
 
 ![architecture](../../assets/post/2025/apim-aoai/00-architecture.png)
 
-# 01 Add Azure Open AI as backend resource
+# Add Azure Open AI as backend resource
 
 Go to API Management services > `nicold-apim` > Backends > Add
 * Name: `apim-001`
@@ -63,7 +63,7 @@ Go to API Management services > `nicold-apim` > Backends > Add
 Here the result:
 ![backend resorces added](../../assets/post/2025/apim-aoai/01-add-backend-resources.png)
 
-# 02 show apim-001 endpoint as root API
+# Show apim-001 endpoint as root API
 
 Go to Azure Portal > API Management Sevices > `nicold-apim` > API > Create form Azure Resources > Azure OpenAI Service
 * Azure OpenAI instance: `nicold-aoai-001`
@@ -84,7 +84,7 @@ To test this endpoint go to: API Management Services > `nicold-apim` > APIs > Al
 * request body: `{"messages": [{ "role": "system","content": "You are a helpful assistant."},{ "role": "user", "content": "Tell me a joke!"} ]}`
 * click: [SEND]
 
-here a script to test this configuration:
+here also a powershell script to test this configuration:
 
 ```
 $openai = @{
@@ -108,13 +108,18 @@ $headers = [ordered]@{
 # Send a request to generate an answer
 $url = "$($openai.api_base)/deployments/$($openai.name)/chat/completions?api-version=$($openai.api_version)"
 
-$response = IRM -Uri $url -Headers $headers -Body $body -Method Post -ContentType 'application/json'
-$response.choices.message.content
+$response = Invoke-WebRequest -Uri $url -Headers $headers -Body $body -Method Post -ContentType 'application/json'
 
+# Show response headers
+$response.headers
+$responseObj = ConvertFrom-Json $response.content
+
+# Show response body
+$responseObj.choices.message.content
 ```
 
 # Implement throttling
-The following policy limits the access at 10 requests per minute. Paste the xml in: API Management Service > 
+The following policy limits the access **at 10 requests per minute**. Paste the xml in: API Management Service > 
 `nicold-apim` > APIs > All APIs > `/` > all operations > inbound processing > policies (code editor)
 
 ```
@@ -137,18 +142,102 @@ The following policy limits the access at 10 requests per minute. Paste the xml 
 
 ```
 
-to limit at 2 calls **per IP** in 60 seconds, use the following rate-limit xml:
+To limit at 2 calls **per IP** in 60 seconds, use the following rate-limit xml:
 ```
 <rate-limit-by-key calls="2" renewal-period="60" counter-key="@(context.Request.IpAddress)" />
 ```
 
-to limit at 2 calls per API KEY in 60 seconds, use the following rate-limit xml:
+To limit at 2 calls per API KEY in 60 seconds, use the following rate-limit xml:
 ```
 <rate-limit-by-key calls="2" renewal-period="60" counter-key="@(context.Request.Headers.GetValueOrDefault("api-key"))" />
 ```
 
+# Show in a Response header (_aoai-origin_) the host of the OpenAI API Called
+
+Add the following XML in the **outbound** policy: 
+
+```
+<outbound>
+    <base />
+    <set-header name="aoai-origin" exists-action="override">
+        <value>@(context.Request.Url.Host)</value>
+    </set-header>
+</outbound>
+```
+
+# Round robin calls between 2 instances of Open AI
+
+Use the following **inbound** policy:
+
+```
+<inbound>
+    <base />
+    <cache-lookup-value key="backend-rr" variable-name="backend-rr" />
+    <choose>
+        <when condition="@(!context.Variables.ContainsKey("backend-rr"))">
+            <set-variable name="backend-rr" value="0" />
+            <cache-store-value key="backend-rr" value="0" duration="100" />
+        </when>
+    </choose>
+    <choose>
+        <when condition="@(Convert.ToInt32(context.Variables["backend-rr"]) == 0)">
+            <set-backend-service backend-id="apim-001" />
+            <set-variable name="backend-rr" value="1" />
+            <cache-store-value key="backend-rr" value="1" duration="100" />
+        </when>
+        <otherwise>
+            <set-backend-service backend-id="apim-002" />
+            <set-variable name="backend-rr" value="0" />
+            <cache-store-value key="backend-rr" value="0" duration="100" />
+        </otherwise>
+    </choose>
+</inbound>
+```
+> 💥In a round robin scenario, both open AI instances must have same deployments
+
+# Fallback on a second openAI instance for 30 secs. If the first send a 4xx error
+
+TODEBUG!!!
 
 
+<policies>
+    <inbound>
+        <base />
+        <cache-lookup-value key="useSecondaryBackend" variable-name="useSecondaryBackend" />
+        <choose>
+            <when condition="@(context.Variables["useSecondaryBackend"] != null)">
+                <set-backend-service backend-id="apim-002" />
+            </when>
+            <otherwise>
+                <set-backend-service backend-id="apim-001" />
+            </otherwise>
+        </choose>
+    </inbound>
+    <backend>
+        <base />
+    </backend>
+    <outbound>
+        <base />
+    </outbound>
+    <on-error>
+        <base />
+        <set-header name="aoai-origin" exists-action="override">
+            <value>@(context.Request.Url.Host)</value>
+        </set-header>
+        <choose>
+            <when condition="@(context.Response.StatusCode >= 400 && context.Response.StatusCode < 500)">
+				<set-variable name="useSecondaryBackend" value="true" />
+                <cache-store-value key="useSecondaryBackend" value="true" duration="60" />
+            </when>
+        </choose>
+    </on-error>
+</policies>
+
+
+
+
+
+--------------------------
 
 * Azure APIM to scale AOAI - https://github.com/Azure/aoai-apim 
 * Manage Azure OpenAI using APIM - https://github.com/microsoft/AzureOpenAI-with-APIM
