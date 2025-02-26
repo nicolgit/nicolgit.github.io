@@ -36,9 +36,9 @@ Il laboratorio su cui lavoró prevede le seguenti risorse:
 
 come mostrato nello schema seguente:
 
-«««««««««««««««««««««««««««««««« ARCHITETTURA SUPER SEMPLICE »»»»»»»»»»»»»»»»»»»»»»»»»»»»»
+![architecture](../../assets/post/2025/apim-aoai/00-architecture.png)
 
-# 01 Add Azure open AI as backend resource
+# 01 Add Azure Open AI as backend resource
 
 Go to API Management services > `nicold-apim` > Backends > Add
 * Name: `apim-001`
@@ -60,7 +60,7 @@ Go to API Management services > `nicold-apim` > Backends > Add
     * Key: _your endpoint key_
 * click [create]
 
-here the result:
+Here the result:
 ![backend resorces added](../../assets/post/2025/apim-aoai/01-add-backend-resources.png)
 
 # 02 show apim-001 endpoint as root API
@@ -84,29 +84,69 @@ To test this endpoint go to: API Management Services > `nicold-apim` > APIs > Al
 * request body: `{"messages": [{ "role": "system","content": "You are a helpful assistant."},{ "role": "user", "content": "Tell me a joke!"} ]}`
 * click: [SEND]
 
+here a script to test this configuration:
 
+```
+$openai = @{
+   api_key     = "my-api-key"
+   api_base    = "https://nicold-apim.azure-api.net/" # your endpoint
+   api_version = '2024-02-01'
+   name        = 'gpt4o-001' # custom name you chose for your deployment
+}
 
+$body = '{
+  "messages": [
+    { "role": "system","content": "You are a helpful assistant."},
+    { "role": "user", "content": "Tell me a joke!"}
+  ]}'
 
+# Header for authentication
+$headers = [ordered]@{
+   'api-key' = $openai.api_key
+}
 
+# Send a request to generate an answer
+$url = "$($openai.api_base)/deployments/$($openai.name)/chat/completions?api-version=$($openai.api_version)"
 
+$response = IRM -Uri $url -Headers $headers -Body $body -Method Post -ContentType 'application/json'
+$response.choices.message.content
 
+```
 
-----------------------------
+# Implement throttling
+The following policy limits the access at 10 requests per minute. Paste the xml in: API Management Service > 
+`nicold-apim` > APIs > All APIs > `/` > all operations > inbound processing > policies (code editor)
 
+```
+<policies>
+    <inbound>
+        <base />
+        <rate-limit calls="10" renewal-period="60" />
+        <set-backend-service id="apim-generated-policy" backend-id="apim-001" />
+    </inbound>
+    <backend>
+        <base />
+    </backend>
+    <outbound>
+        <base />
+    </outbound>
+    <on-error>
+        <base />
+    </on-error>
+</policies>
 
-- esporre una API attraverso policy
-  - livello root
-  - in /aoai (2 instance) (instance/deployment...)
-  
+```
 
+to limit at 2 calls **per IP** in 60 seconds, use the following rate-limit xml:
+```
+<rate-limit-by-key calls="2" renewal-period="60" counter-key="@(context.Request.IpAddress)" />
+```
 
+to limit at 2 calls per API KEY in 60 seconds, use the following rate-limit xml:
+```
+<rate-limit-by-key calls="2" renewal-period="60" counter-key="@(context.Request.Headers.GetValueOrDefault("api-key"))" />
+```
 
-
-(forse questi non servono più)
-
-# More information
-* Azure Open AI Services: <https://learn.microsoft.com/en-us/azure/ai-services/openai/overview>
-* Azure API Management: <https://learn.microsoft.com/en-us/azure/api-management/api-management-key-concepts>
 
 
 
