@@ -19,11 +19,7 @@ Combining Azure Open AI with Azure API Manager enables enterprises to efficientl
 
 **In this post I show a collection of recipes for API Management that I have seen used by customers and partners who needed to expose one or more instances of Azure OpenAI.**
 
-> In these posts we will focus on configuring policies and implementing some usage patterns with them. Network configuration and integration with an Enterprise-scale landing zone (ESLZ) is out of scope. For a walkthrough that guides the integration of APIM and AOAI in a hub & spoke context, you can also refer to [my article](https://github.com/nicolgit/hub-and-spoke-playground/blob/main/scenarios/aoai.md) available as part of [the hub-and-spoke playground project](https://github.com/nicolgit/hub-and-spoke-playground).
-
-> The following architecture and implementation in Azure Architecture Center are **developed** and **maintained** by the Azure Patterns and Practices team. I suggest you bookmark them for further information:
-> * https://learn.microsoft.com/en-us/azure/architecture/ai-ml/architecture/azure-openai-baseline-landing-zone
-> * https://github.com/Azure-Samples/azure-openai-chat-baseline-landing-zone
+> Network configuration and integration with an Enterprise-scale landing zone (ESLZ) is out of scope. For a walkthrough that guides the integration of APIM and AOAI in a hub & spoke context, you can also refer to [my article](https://github.com/nicolgit/hub-and-spoke-playground/blob/main/scenarios/aoai.md) available as part of [the hub-and-spoke playground project](https://github.com/nicolgit/hub-and-spoke-playground).
 
 The lab used for these walk-throughs consists of the following resources:
 
@@ -32,14 +28,18 @@ The lab used for these walk-throughs consists of the following resources:
 
 ![architecture](../../assets/post/2025/apim-aoai/00-architecture.png)
 
-Here are the key recipes we'll cover in this article:
+this is the list of topic I will cover:
 
 - [Add Azure Open AI as backend resource](#add-azure-open-ai-as-backend-resource)
-- [Show apim-001 endpoint as root API](#show-apim-001-endpoint-as-root-api)
+- [Show `apim-001` endpoint as root API](#show-apim-001-endpoint-as-root-api)
 - [Implement throttling](#implement-throttling)
 - [Show in a Response header (_aoai-origin_) the host of the OpenAI API Called](#show-in-a-response-header-aoai-origin-the-host-of-the-openai-api-called)
 - [Round robin calls between 2 instances of Open AI](#round-robin-calls-between-2-instances-of-open-ai)
-- [Fallback on a second openAI instance for 30 secs. If the first send a 4xx error](#fallback-on-a-second-openai-instance-for-30-secs-if-the-first-send-a-4xx-error)
+- [Fallback on a second openAI instance for 30 secs. If the first send a 429 error (too many requests)](#fallback-on-a-second-openai-instance-for-30-secs-if-the-first-send-a-429-error-too-many-requests)
+- [Generate a report of API Usage by access key](#generate-a-report-of-api-usage-by-access-key)
+- [Generate a report of API Usage by source IP](#generate-a-report-of-api-usage-by-source-ip)
+- [Generate a report of backend usage over time](#generate-a-report-of-backend-usage-over-time)
+- [Generate a report of API requests by OpenAI deployment-id used](#generate-a-report-of-api-requests-by-openai-deployment-id-used)
 
 # Add Azure Open AI as backend resource
 
@@ -48,46 +48,46 @@ Go to API Management services > `nicold-apim` > Backends > Add
 * Backend hosting type: Custom URL
 * Runtime URL: https://nicold-aoai-001.openai.azure.com/openai
 * Authorization credential
-  * Headers
-    * Name: `api-key`
-    * Key: _your endpoint key_
-* click [create]
+    * Headers
+        * Name: `api-key`
+        * Key: _your endpoint key_
+* Click [create]
 
 Go to API Management services > `nicold-apim` > Backends > Add
 * Name: `apim-002`
 * Backend hosting type: Custom URL
 * Runtime URL: https://nicold-aoai-002.openai.azure.com/openai
 * Authorization credential
-  * Headers
-    * Name: `api-key`
-    * Key: _your endpoint key_
-* click [create]
+    * Headers
+        * Name: `api-key`
+        * Key: _your endpoint key_
+* Click [create]
 
-Here the result:
-![backend resorces added](../../assets/post/2025/apim-aoai/01-add-backend-resources.png)
+Here is the result:
+![backend resources added](../../assets/post/2025/apim-aoai/01-add-backend-resources.png)
 
-# Show apim-001 endpoint as root API
+# Show `apim-001` endpoint as root API
 
-Go to Azure Portal > API Management Sevices > `nicold-apim` > API > Create form Azure Resources > Azure OpenAI Service
+Go to Azure Portal > API Management Services > `nicold-apim` > API > Create from Azure Resources > Azure OpenAI Service
 * Azure OpenAI instance: `nicold-aoai-001`
 * API Version: `2024-02-01`
 * Display name: `/`
-* name: `root-api`
-* click [review and create] and then [create]
+* Name: `root-api`
+* Click [review and create] and then [create]
 
-This creates a frontend but ALSO a backend. To use the previously created backend go to: 
+This creates a frontend but ALSO a backend. To use the previously created backend, go to:
 
 API Management Services > `nicold-apim` > APIs > All APIs > `/` > Design > Backend > Policies > Base
 
 and change `backend-id="openai-root-openai-endpoint"` to `backend-id="apim-001"`, then save it.
 
-To test this endpoint go to: API Management Services > `nicold-apim` > APIs > All APIs > `/` > Test > `Creates a completion for the chat message` 
-* deployment-id: `gpt4o-001`
-* api-version: `2024-02-01` (same used above)
-* request body: `{"messages": [{ "role": "system","content": "You are a helpful assistant."},{ "role": "user", "content": "Tell me a joke!"} ]}`
-* click: [SEND]
+To test this endpoint, go to: API Management Services > `nicold-apim` > APIs > All APIs > `/` > Test > `Creates a completion for the chat message`
+* Deployment-id: `gpt4o-001`
+* API-version: `2024-02-01` (same as used above)
+* Request body: `{"messages": [{ "role": "system","content": "You are a helpful assistant."},{ "role": "user", "content": "Tell me a joke!"} ]}`
+* Click: [SEND]
 
-here also a powershell script to test this configuration:
+Here is also a PowerShell script to test this configuration:
 
 ```ps1
 $openai = @{
@@ -122,8 +122,8 @@ $responseObj.choices.message.content
 ```
 
 # Implement throttling
-The following policy limits the access **at 10 requests per minute**. Paste the xml in: API Management Service > 
-`nicold-apim` > APIs > All APIs > `/` > all operations > inbound processing > policies (code editor)
+
+The following policy limits access to **10 requests per minute**. Paste the XML in: API Management Service > `nicold-apim` > APIs > All APIs > `/` > all operations > inbound processing > policies (code editor)
 
 ```xml
 <policies>
@@ -157,7 +157,7 @@ To limit at 2 calls per API KEY in 60 seconds, use the following rate-limit xml:
 
 # Show in a Response header (_aoai-origin_) the host of the OpenAI API Called
 
-Add the following XML in the **outbound** policy: 
+Add the following XML in the **outbound** policy:
 
 ```xml
 <outbound>
@@ -167,7 +167,6 @@ Add the following XML in the **outbound** policy:
     </set-header>
 </outbound>
 ```
-
 # Round robin calls between 2 instances of Open AI
 
 Use the following **inbound** policy:
@@ -196,9 +195,9 @@ Use the following **inbound** policy:
     </choose>
 </inbound>
 ```
-> 💥In a round robin scenario, both open AI instances must have same deployments
+> 💥In a round robin scenario, inorder to work properli both open AI instances must have same deployments
 
-# Fallback on a second openAI instance for 30 secs. If the first send a 4xx error
+# Fallback on a second openAI instance for 30 secs. If the first send a 429 error (too many requests)
 
 TODEBUG!!!
 
@@ -236,14 +235,86 @@ TODEBUG!!!
     </on-error>
 </policies>
 
+# Generate a report of API Usage by access key
+Go to: API Management Services > `nicold-apim` > logs > New QUery (KQL mode):
+
+```
+ApiManagementGatewayLogs
+| where ApimSubscriptionId != ''
+| summarize count() by ApimSubscriptionId
+| order by count_ desc
+| render table
+```
+
+Pie chart
+
+```
+ApiManagementGatewayLogs
+| where ApimSubscriptionId != ''
+| summarize  count() by ApimSubscriptionId 
+| order by count_ desc 
+| render piechart 
+```
+
+![pie chart](../../assets/post/2025/apim-aoai/02-pie-chart.png)
 
 
+# Generate a report of API Usage by source IP
+Go to: API Management Services > `nicold-apim` > logs > New QUery (KQL mode):
 
+```
+ApiManagementGatewayLogs
+| where ApimSubscriptionId != ''
+| summarize count() by CallerIpAddress
+| order by count_ desc
+| render table
 
---------------------------
+``` 
 
-* Azure APIM to scale AOAI - https://github.com/Azure/aoai-apim 
-* Manage Azure OpenAI using APIM - https://github.com/microsoft/AzureOpenAI-with-APIM
+# Generate a report of backend usage over time
 
+Go to: API Management Services > `nicold-apim` > logs > New QUery (KQL mode):
+
+Group by hour
+
+```
+ApiManagementGatewayLogs 
+| where ApimSubscriptionId != '' 
+| summarize  count() by bin (TimeGenerated, 1h), BackendId 
+| render timechart
+
+```
+Grouped by day
+ 
+```
+ApiManagementGatewayLogs 
+| where ApimSubscriptionId != '' 
+| summarize  count() by bin (TimeGenerated, 1d), BackendId 
+| render timechart
+```
+
+![time chart](../../assets/post/2025/apim-aoai/03-usage-over-time.png)
+
+Column chart
+
+```
+ApiManagementGatewayLogs
+| where ApimSubscriptionId != ''
+| summarize count() by bin(TimeGenerated, 1h), BackendId
+| project TimeGenerated, BackendId, count_
+| render columnchart  kind=stacked
+```
+
+# Generate a report of API requests by OpenAI deployment-id used
+
+Go to: API Management Services > `nicold-apim` > logs > New QUery (KQL mode):
+
+```
+ApiManagementGatewayLogs
+| extend DeploymentSubstring = extract(@"deployments/([^/]+)", 1, Url)
+| where ApimSubscriptionId != ''
+| summarize count() by DeploymentSubstring
+| render table
+```
 
 [def]: #recipes-list
