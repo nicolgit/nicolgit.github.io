@@ -1,12 +1,12 @@
 ---
-title: Open AI recipes for Azure API Management Service
+title: Azure Open AI recipes for Azure API Management Service
 date: 2025-01-01 10:00
 tags: [Azure, networking, API manager, OpenAI ]
-excerpt: "xxx"
+excerpt: "A collection of recipes for API Management for those who need to expose one or more instances of Azure OpenAI"
 
 header:
-  overlay_image: https://live.staticflickr.com/65535/52755090506_6cf0808a3c_h.jpg
-  caption: "Photo credit: [**nicola since 1972**](https://www.flickr.com/photos/15216811@N06/52755090506)"
+  overlay_image: https://live.staticflickr.com/65535/54308248466_dc89a5f3d7_h.jpg
+  caption: "Photo credit: [**nicola since 1972**](https://www.flickr.com/photos/15216811@N06/54308248466/)"
 ---
 
 Azure OpenAI Service provides REST API access to OpenAI's powerful language models including o1, o1-mini, GPT-4o, GPT-4o mini, GPT-4 Turbo with Vision, GPT-4, GPT-3.5-Turbo, and Embeddings model series. These models can be easily adapted to your specific task including but not limited to content generation, summarization, image understanding, semantic search, and natural language to code translation.
@@ -17,26 +17,29 @@ By using Azure API Manager in front of Azure Open AI instances, enterprises can 
 
 Combining Azure Open AI with Azure API Manager enables enterprises to efficiently distribute and manage their AI capabilities while maintaining high standards of security and performance.
 
-----------------------------
+**In this post I show a collection of recipes for API Management that I have seen used by customers and partners who needed to expose one or more instances of Azure OpenAI.**
 
-obiettivo di questa serie di post é quello di mostrate alcuni dei pattern da usare per esporre Azure Open AI attraverso APIM. 
+> In these posts we will focus on configuring policies and implementing some usage patterns with them. Network configuration and integration with an Enterprise-scale landing zone (ESLZ) is out of scope. For a walkthrough that guides the integration of APIM and AOAI in a hub & spoke context, you can also refer to [my article](https://github.com/nicolgit/hub-and-spoke-playground/blob/main/scenarios/aoai.md) available as part of [the hub-and-spoke playground project](https://github.com/nicolgit/hub-and-spoke-playground).
 
-In this context, the following architecturea and implementation in Azure Architecture Center are **developed** and **maintained** by Azure Pattern and Practices team. I suggest yout to bookmark them for further information.
+> The following architecture and implementation in Azure Architecture Center are **developed** and **maintained** by the Azure Patterns and Practices team. I suggest you bookmark them for further information:
+> * https://learn.microsoft.com/en-us/azure/architecture/ai-ml/architecture/azure-openai-baseline-landing-zone
+> * https://github.com/Azure-Samples/azure-openai-chat-baseline-landing-zone
 
-* https://learn.microsoft.com/en-us/azure/architecture/ai-ml/architecture/azure-openai-baseline-landing-zone
-* https://github.com/Azure-Samples/azure-openai-chat-baseline-landing-zone
+The lab used for these walk-throughs consists of the following resources:
 
-in questi post ci focalizzeremo sulla configurazione delle policy e di implementazione di alcuni pattern di utilizzo con esse. La parte di configurazione della rete e l'integrazione con una ESLZ é out of scope. Per un walktrough che guidi l'integrazione di APIM ed AOAI in un contesto di hub & spoke, è possibile fare riferimento anche [al mio articolo](https://github.com/nicolgit/hub-and-spoke-playground/blob/main/scenarios/aoai.md) disponibile nell'ambito del progetto [the hub-and-spoke playground](https://github.com/nicolgit/hub-and-spoke-playground)
-
-
-Il laboratorio su cui lavoró prevede le seguenti risorse:
-
-* Azure API Management service (developer SKU) enterpriseapim
+* Azure API Management service (developer SKU) `nicold-apim`
 * 2 x Azure OpenAI service (S0 SKU) `apimaoai01` and `apimaoai02`
 
-come mostrato nello schema seguente:
-
 ![architecture](../../assets/post/2025/apim-aoai/00-architecture.png)
+
+Here are the key recipes we'll cover in this article:
+
+- [Add Azure Open AI as backend resource](#add-azure-open-ai-as-backend-resource)
+- [Show apim-001 endpoint as root API](#show-apim-001-endpoint-as-root-api)
+- [Implement throttling](#implement-throttling)
+- [Show in a Response header (_aoai-origin_) the host of the OpenAI API Called](#show-in-a-response-header-aoai-origin-the-host-of-the-openai-api-called)
+- [Round robin calls between 2 instances of Open AI](#round-robin-calls-between-2-instances-of-open-ai)
+- [Fallback on a second openAI instance for 30 secs. If the first send a 4xx error](#fallback-on-a-second-openai-instance-for-30-secs-if-the-first-send-a-4xx-error)
 
 # Add Azure Open AI as backend resource
 
@@ -86,7 +89,7 @@ To test this endpoint go to: API Management Services > `nicold-apim` > APIs > Al
 
 here also a powershell script to test this configuration:
 
-```
+```ps1
 $openai = @{
    api_key     = "my-api-key"
    api_base    = "https://nicold-apim.azure-api.net/" # your endpoint
@@ -122,7 +125,7 @@ $responseObj.choices.message.content
 The following policy limits the access **at 10 requests per minute**. Paste the xml in: API Management Service > 
 `nicold-apim` > APIs > All APIs > `/` > all operations > inbound processing > policies (code editor)
 
-```
+```xml
 <policies>
     <inbound>
         <base />
@@ -143,12 +146,12 @@ The following policy limits the access **at 10 requests per minute**. Paste the 
 ```
 
 To limit at 2 calls **per IP** in 60 seconds, use the following rate-limit xml:
-```
+```xml
 <rate-limit-by-key calls="2" renewal-period="60" counter-key="@(context.Request.IpAddress)" />
 ```
 
 To limit at 2 calls per API KEY in 60 seconds, use the following rate-limit xml:
-```
+```xml
 <rate-limit-by-key calls="2" renewal-period="60" counter-key="@(context.Request.Headers.GetValueOrDefault("api-key"))" />
 ```
 
@@ -156,7 +159,7 @@ To limit at 2 calls per API KEY in 60 seconds, use the following rate-limit xml:
 
 Add the following XML in the **outbound** policy: 
 
-```
+```xml
 <outbound>
     <base />
     <set-header name="aoai-origin" exists-action="override">
@@ -169,7 +172,7 @@ Add the following XML in the **outbound** policy:
 
 Use the following **inbound** policy:
 
-```
+```xml
 <inbound>
     <base />
     <cache-lookup-value key="backend-rr" variable-name="backend-rr" />
@@ -241,3 +244,6 @@ TODEBUG!!!
 
 * Azure APIM to scale AOAI - https://github.com/Azure/aoai-apim 
 * Manage Azure OpenAI using APIM - https://github.com/microsoft/AzureOpenAI-with-APIM
+
+
+[def]: #recipes-list
