@@ -1,6 +1,6 @@
 ---
 title: Azure Open AI recipes for Azure API Management Service
-date: 2025-02-28 10:00
+date: 2025-02-27 10:00
 tags: [Azure, networking, API manager, OpenAI ]
 excerpt: "A collection of recipes for Azure API Management for those who need to expose one or more instances of Azure OpenAI."
 
