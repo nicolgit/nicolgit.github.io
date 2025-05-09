@@ -33,7 +33,7 @@ Invoke-WebRequest -UseBasicParsing -Uri $downloadUri -OutFile $pythonSetupFile
 $installPythonCommand = '.\' + $pythonSetupFile
 Start-Process -wait $installPythonCommand -ArgumentList @('/quiet', 'InstallAllUsers=1', 'PrependPath=1', 'Include_test=0')
 
-$env:PATH += "C:\Program Files\" + $directory + ";"
+$env:PATH += ";C:\Program Files\" + $directory + ";"
 
 #
 # STEP2: install git
