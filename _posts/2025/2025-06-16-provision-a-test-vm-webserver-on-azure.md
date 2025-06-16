@@ -1,6 +1,6 @@
 ---
 title: How to quickly deploy a test web server on an Azure VM
-date: 2025-06-16 10:00
+date: 2025-06-15 10:00
 tags: [Azure, Virtual Machine, Portal, web server, custom script extension]
 ---
 
