@@ -8,10 +8,7 @@ For my **Labs**, I often need to create and build virtual machines. **Many virtu
 
 
 # Windows machine
-
-From Azure portal is quick enough to create a virtual machines. In particular I use as the starting image "**windows 2019 datacenter gen1**".
-
-Once the machine is created, go tpo Azure Portal > virtual machines > `vmname` > run command > run powershell script
+Once the machine is created, go to Azure Portal > virtual machines > `vmname` > run command > run powershell script
 
 type:
 
@@ -28,8 +25,6 @@ After a couple of minutes the script will be executed, and IIS will be provision
 ![browser output](../../assets/post/2021/install-iis-output.png)
 
 # Linux machine
-From Azure portal is quick enough to create a virtual machines. In particular I use as the starting image "**windows 2019 datacenter gen1**".
-
 Once the machine is created, go tpo Azure Portal > virtual machines > `vmname` > run command > run linux shell script
 
 type:
