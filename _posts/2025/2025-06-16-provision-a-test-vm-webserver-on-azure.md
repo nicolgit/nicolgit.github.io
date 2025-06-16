@@ -25,7 +25,7 @@ click **Run**
 
 After a couple of minutes the script will be executed, and IIS will be provisioned and working.
 
-![browser output](../assets/post/2021/install-iis-output.png)
+![browser output](../../assets/post/2021/install-iis-output.png)
 
 # Linux machine
 From Azure portal is quick enough to create a virtual machines. In particular I use as the starting image "**windows 2019 datacenter gen1**".
