@@ -115,33 +115,35 @@ analytics:
 author:
   name             : "Nicola Delfino"
   avatar           : "/assets/images/bio-photo.jpg"
-  bio              : "I meet people, I do things for @Microsoft. My opinions and my tweets are my own, not the views of my employer and should NEVER be taken seriously."
+  bio              : "I meet people, I do things for @Microsoft :). My opinions and my tweets are my own, not the views of my employer and should NEVER be taken seriously."
   location         : "Italy"
   email            : "nicola.delfino@outlook.com"
   uri              :
   home             : # null (default), "absolute or relative url to link to author home"
   links:
+    - label: "Buy me a coffee"
+      icon: "fas fa-fw fa-coffee"
+      url: "https://www.buymeacoffee.com/nicolcoffee"
+    - label: "GitHub"
+      icon: "fab fa-fw fa-github"
+      url: "https://github.com/nicolgit"
+    - label: "Linkedin"
+      icon: "fab fa-fw fa-linkedin"
+      url: "https://www.linkedin.com/in/nicoladelfino"
     - label: "X"
-      icon: "fab fa-fw fa-x-twitter"
+      icon: "fab fa-fw fa-twitter"
       url: "https://x.com/nicoltwit"
     - label: "Facebook"
       icon: "fab fa-fw fa-facebook-square"
       url: "https://facebook.com/nicola.delfino"
-    - label: "GitHub"
-      icon: "fab fa-fw fa-github"
-      url: "https://github.com/nicolgit"
     - label: "Instagram"
       icon: "fab fa-fw fa-instagram"
       url: "https://instagram.com/nicolgramm"
     - label: "Flickr"
       icon: "fab fa-fw fa-flickr"
       url: "https://flickr.com/photos/15216811@N06"
-    - label: "Linkedin"
-      icon: "fab fa-fw fa-linkedin"
-      url: "https://www.linkedin.com/in/nicoladelfino"
-    - label: "Buy me a coffee"
-      icon: "fas fa-fw fa-coffee"
-      url: "https://www.buymeacoffee.com/nicolcoffee"
+    
+
 # Site Footer
 footer:
   links:
