@@ -121,9 +121,9 @@ author:
   uri              :
   home             : # null (default), "absolute or relative url to link to author home"
   links:
-    - label: "Twitter"
-      icon: "fab fa-fw fa-twitter-square"
-      url: "https://twitter.com/nicoltwit"
+    - label: "X"
+      icon: "fab fa-fw fa-x-twitter"
+      url: "https://x.com/nicoltwit"
     - label: "Facebook"
       icon: "fab fa-fw fa-facebook-square"
       url: "https://facebook.com/nicola.delfino"
@@ -139,6 +139,9 @@ author:
     - label: "Linkedin"
       icon: "fab fa-fw fa-linkedin"
       url: "https://www.linkedin.com/in/nicoladelfino"
+    - label: "Buy me a coffee"
+      icon: "fas fa-fw fa-coffee"
+      url: "https://www.buymeacoffee.com/nicolcoffee"
 # Site Footer
 footer:
   links:
