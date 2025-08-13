@@ -2,16 +2,16 @@
 title: Azure OpenAI powershell chat-completition call sample
 date: 2025-02-24 10:00
 tags: [Azure, powershell, OpenAI ]
-excerpt: "sample to copy and paste"
+excerpt: "a powershell script that shows how to call an Azure OpenAI chat completition endpoint API"
 
 header:
   overlay_image: https://live.staticflickr.com/65535/52755090506_6cf0808a3c_h.jpg
   caption: "Photo credit: [**nicola since 1972**](https://www.flickr.com/photos/15216811@N06/52755090506)"
 ---
 
-The following powershell samples shows how to call an Azure OpenAI chat completition endpoint API
+A powershell script that shows how to call an Azure OpenAI chat completition endpoint API
 
-```
+```ps1
 # Azure OpenAI metadata variables
 $openai = @{
    api_key     = "YOUR_APIKEY_HERE"
