@@ -13,7 +13,7 @@ Recently, I helped a customer understand a puzzling behavior related to a privat
 
 ## TL;DR
 
-The reason for the apparently anomalous behavior of private endpoints is that, although a private endpoint appears in the Azure portal as a network interface (NIC) connected to a subnet,** it's actually implemented completely differently under the hood**.
+The reason for the apparently anomalous behavior of private endpoints is that, although a private endpoint appears in the Azure portal as a network interface (NIC) connected to a subnet, **it's actually implemented completely differently under the hood**.
 
 When Azure creates a private endpoint and attaches it to a subnet, what actually happens is that Azure creates explicit routes on all NICs connected to the VNet where the private endpoint is activated.
 
