@@ -1,5 +1,5 @@
 ---
-title: "Azure Private Endpoint Routing in Hub-and-Spoke Networks: Understanding the Hidden Behavior"
+title: "Azure Private Endpoint Routing in Hub-and-Spoke Networks: Understanding the hidden behavior"
 date: 2025-09-01 10:00
 tags: [Azure, Networking, Private Endpoint, Hub-and-Spoke, Security]
 excerpt: "Discover why Azure private endpoints behave unexpectedly in hub-and-spoke networks by creating implicit routes across peered VNets, and learn effective solutions to maintain centralized traffic control through Azure Firewall."
@@ -13,7 +13,7 @@ Recently, I helped a customer understand a puzzling behavior related to a privat
 
 ## TL;DR
 
-The reason for the apparently anomalous behavior of private endpoints is that, although a private endpoint appears in the Azure portal as a network interface (NIC) connected to a subnet, it's actually implemented completely differently under the hood.
+The reason for the apparently anomalous behavior of private endpoints is that, although a private endpoint appears in the Azure portal as a network interface (NIC) connected to a subnet,** it's actually implemented completely differently under the hood**.
 
 When Azure creates a private endpoint and attaches it to a subnet, what actually happens is that Azure creates explicit routes on all NICs connected to the VNet where the private endpoint is activated.
 
@@ -40,6 +40,8 @@ In this configuration, we would expect the following connectivity to the storage
 * spoke-01-vm HTTPS to storage-01: ✅ OK
 * spoke-02-vm HTTPS to storage-01: ✅ OK  
 * hub-vm-01 HTTPS to storage-01: ✅ OK
+
+WHY ?!?!? :-)
 
 ## Understanding the Root Cause
 
