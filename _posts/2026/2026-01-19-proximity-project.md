@@ -53,9 +53,9 @@ What matters is the REAL walking time: Isochrones model this more accurately by 
 
 It forces you to think about data modeling, computation cost, caching, and the frameworks to use.
 
-When I started building The Proximity project, the goal seemed simple: compute walking-distance isochrones for multiple transport stops and display them interactively.
+When I started building, the goal seemed simple: compute walking-distance isochrones for multiple transport stops and display them interactively.
 
-As the project grew, scaling it across cities, transport types, and interactive maps forced deliberate architectural choices.
+**As the project grew, scaling it across cities, transport types, and interactive maps forced deliberate architectural choices.**
 
 ## The Frontend
 SPA with Vue and TypeScript:
@@ -175,12 +175,12 @@ Building Proximity was a technically simple idea on paper, but the process taugh
 
 # Want to go deeper?
 
-If you made it this far, thank you for reading 🙏.
+If you made it this far, **thank you for reading** 😅.
 
 If you'd like to explore more:
 
-* Try the live tool: [Proximity project](https://proximity.duckiesfarm.com/)
-* Browse the source code: [GitHub repo](https://github.com/nicolgit/proximity)
+* **Try the live tool: [Proximity project](https://proximity.duckiesfarm.com/)**
+* **Browse the source code: [GitHub repo](https://github.com/nicolgit/proximity)**
 
-If you have ideas, suggestions, or spot something that could be improved, please open an issue on GitHub — that's the best place to discuss features, fixes, and architectural decisions.
+If you have ideas, suggestions, or spot something that could be improved, **please open an issue on GitHub** — that's the best place to discuss features, fixes, and architectural decisions.
 
