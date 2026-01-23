@@ -82,7 +82,6 @@ On the data side:
 Benefits: fast, cheap, globally distributed, and easy to update. Most of the data is relatively static, so caching reduces latency and costs.
 
 ## Isochrone computation
-
 Real-time computation of walking-distance isochrones **is too expensive**: iterating over the pedestrian network for thousands of stops and stations would be slow. So I opted for offline precomputation using a CLI generator written in C#.
 
 In this setup:
@@ -106,14 +105,12 @@ _Architecture deployed on Azure_
 _Azure function system identity RBAC_
 
 ## Infrastructure as Code (IaC)
-
 All resources are deployed using Infrastructure-as-Code written in **Bicep**. Benefits:
 * Reproducibility: environments can be recreated consistently
 * Traceability: every change is tracked in source control
 * Ease of iteration: no manual clicks, everything is declarative
 
 ## Azure network isolation
-
 * All backend services run behind a private endpoint in an isolated Azure virtual network.
 * Frontend accesses backend securely through this private link.
 * System-assigned identities are used for authentication between services, eliminating the need for secrets in code.
@@ -148,7 +145,6 @@ Each choice reflects a trade-off between simplicity, performance, and maintainab
 Building Proximity was a technically simple idea on paper, but the process taught me many lessons — both about architecture and about using AI-assisted development.
 
 ## Highlights
-
 * VS Code + Copilot accelerated development **enormously**.
 * Writing C# code I already knew well, I went from hours to minutes on many tasks.
 * For Vue and Leaflet, which were completely new to me, Copilot helped me scaffold components and learn the development paradigm quickly.
@@ -156,7 +152,6 @@ Building Proximity was a technically simple idea on paper, but the process taugh
 * Hands-on experience with new libraries: I now have a solid foundation in Vue and Leaflet, which will inform future projects.
 
 ## Lowlights
-
 * At first, I let AI drive too much of the frontend implementation because I wanted to see what it would produce.
   * **Result**: some code is verbose, repetitive, or not as clean as I would have written manually.
   * **Lesson**: when using AI for new technologies, prepare focused, precise prompts for better results.
@@ -164,7 +159,6 @@ Building Proximity was a technically simple idea on paper, but the process taugh
   * Proper upfront design reduces refactoring and ensures maintainable code.
 
 # Key takeaways
-
 
 * AI can accelerate coding and learning, but it does not replace careful planning.
 * Spend time upfront defining prompts, patterns, and architecture, especially with unfamiliar technologies.
