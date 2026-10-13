@@ -2,7 +2,7 @@
 title: "Assigning Contributor to a Customer Managed Identity through Azure Lighthouse"
 date: 2026-10-13 10:00
 tags: [Azure, Lighthouse, Managed Identity, CLI]
-excerpt: "Proximity project - a sandbox for practicing real cloud architecture, experimenting with new frameworks, and stress-testing patterns like serverless, IaC, and AI-assisted development in a space where I can make deliberate, opinionated decisions end to end."
+excerpt: "A step-by-step guide to assigning the Contributor role to a customer’s user-assigned managed identity from a service provider tenant through Azure Lighthouse."
 
 
 ---
