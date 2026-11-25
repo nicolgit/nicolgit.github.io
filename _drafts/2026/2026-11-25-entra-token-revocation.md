@@ -1,25 +1,23 @@
 ---
 title: Access Tokens Have No Undo Button - Lifetime, Revocation and Step-Up in Microsoft Entra ID
 date: 2026-11-26 10:00
-tags: [Microsoft Entra ID, OAUTH2, OpenIDConnect, security, identity, Conditional Access]
+tags: [Microsoft Entra ID, OAUTH2, OpenIDConnect, security, identity, Conditional Access, Azure]
 excerpt: "Why can't a stolen access token be revoked immediately? Explore token lifetimes in Microsoft Entra ID, the limits of Continuous Access Evaluation, and how shorter lifetimes and step-up authentication reduce the exposure window for your APIs."
 
 ---
-
-
 Sooner or later, every team building an application hears this question from security: *"If a user's token is stolen, how fast can we kill it?"* The answer depends on how authentication works and on which parts of the token lifecycle the identity provider controls.
 
 This post walks from Basic authentication to cookies to OpenID Connect and OAuth 2.0, then focuses on Microsoft Entra ID: token lifetimes, what revocation really does, and where Continuous Access Evaluation (CAE), Conditional Access and authentication context help—and where they stop.
 
-**A note on scope:** this isn't a complete guide to the protocols involved, their variants, exceptions or RFCs. Each section covers only what you need to understand the access-token problem and how Entra ID helps contain it. Every diagram links to its editable draw.io source, free to reuse.
+**A note on scope:** this isn't a complete guide to the protocols involved, their variants, exceptions or RFCs. Each section covers only what you need to understand the access-token problem and how Entra ID helps contain it. 
 
 ## 1. Basic authentication
 
 Basic authentication is HTTP's simplest scheme. The server answers an unauthenticated request with `401 Unauthorized` and a `WWW-Authenticate: Basic` header; the browser asks the user for a username and password and, from then on, sends them with **every** request in the `Authorization` header, merely base64-encoded.
 
-![Basic authentication flow](images/01-basic-auth.png)
+![Basic authentication flow](/assets/post/2026/entra-token/01-basic-auth.png)
 
-*[Download the editable draw.io version](images/01-basic-auth.drawio)*
+<p style="text-align: center"><em>download the <a href="/assets/post/2026/entra-token/01-basic-auth.drawio">draw.io source file</a></em></p>
 
 **Pros:** it's trivial to implement, needs no state on the server and is understood by every HTTP client and library.
 
@@ -36,9 +34,9 @@ Basic authentication is HTTP's simplest scheme. The server answers an unauthenti
 
 Cookie (or session) authentication fixed the "password on every request" problem. The user signs in once through an HTML form; the server validates the credentials, creates a session (an identifier mapped to the user in a server-side store, or an encrypted ticket) and returns it in a `Set-Cookie` header. The browser then attaches the cookie automatically to every request to that site.
 
-![Cookie-based authentication flow](images/02-cookie-auth.png)
+![Cookie-based authentication flow](/assets/post/2026/entra-token/02-cookie-auth.png)
 
-*[Download the editable draw.io version](images/02-cookie-auth.drawio)*
+<p style="text-align: center"><em>download the <a href="/assets/post/2026/entra-token/02-cookie-auth.drawio">draw.io source file</a></em></p>
 
 **Pros:** the password is sent only once, the server can end a session whenever it wants, and the `HttpOnly`, `Secure` and `SameSite` flags harden the cookie against script access and cross-site abuse.
 
@@ -57,9 +55,9 @@ Is a cookie safer than a bearer token? Not intrinsically. Both are bearer artifa
 
 OAuth 2.0 (2012) is an authorization framework; OpenID Connect (2014) adds an identity layer on top of it. With Microsoft Entra ID, the recommended pattern for apps that sign in users is the authorization code flow with PKCE:
 
-![OpenID Connect + OAuth 2.0 authorization code flow](images/03-oidc-oauth2-flow.png)
+![OpenID Connect + OAuth 2.0 authorization code flow](/assets/post/2026/entra-token/03-oidc-oauth2-flow.png)
 
-*[Download the editable draw.io version](images/03-oidc-oauth2-flow.drawio)*
+<p style="text-align: center"><em>download the <a href="/assets/post/2026/entra-token/03-oidc-oauth2-flow.drawio">draw.io source file</a></em></p>
 
 1. The client calls the API without a token and gets a `401`.
 2. The client redirects the user to Entra ID's `/authorize` endpoint. The user signs in—password, MFA, passkey—and Conditional Access policies are evaluated.
@@ -74,9 +72,9 @@ OAuth 2.0 (2012) is an authorization framework; OpenID Connect (2014) adds an id
 
 The API never calls Entra ID to check a token. At startup, and then periodically (roughly daily), its middleware downloads Entra ID's public signing keys from the `jwks_uri` in the OpenID configuration document. It then validates each JWT locally: signature (using the key identified by the `kid` header), issuer, audience, expiry, scopes or roles.
 
-![Offline validation of an Entra ID access token](images/04-offline-validation.png)
+![Offline validation of an Entra ID access token](/assets/post/2026/entra-token/04-offline-validation.png)
 
-*[Download the editable draw.io version](images/04-offline-validation.drawio)*
+<p style="text-align: center"><em>download the <a href="/assets/post/2026/entra-token/04-offline-validation.drawio">draw.io source file</a></em></p>
 
 **Advantages:** no round trip to the identity provider per request, so validation is fast, scales horizontally and survives identity-provider hiccups; the API stays stateless.
 
@@ -94,9 +92,9 @@ The API never calls Entra ID to check a token. At startup, and then periodically
 
 ### Default lifetimes
 
-![Token lifetimes in Microsoft Entra ID](images/05-token-lifetimes.png)
+![Token lifetimes in Microsoft Entra ID](/assets/post/2026/entra-token/05-token-lifetimes.png)
 
-*[Download the editable draw.io version](images/05-token-lifetimes.drawio)*
+<p style="text-align: center"><em>download the <a href="/assets/post/2026/entra-token/05-token-lifetimes.drawio">draw.io source file</a></em></p>
 
 - **Access token:** by default, a random value between 60 and 90 minutes (75 on average). The randomness is deliberate: it spreads renewal traffic over time and avoids hourly peaks on Entra ID.
 - **Refresh token:** 24 hours for single-page applications. For other apps it expires after 90 days of inactivity and is replaced with a fresh one every time it's used.
@@ -107,9 +105,9 @@ When an account is compromised, an administrator can disable the user, reset the
 
 It doesn't touch access tokens already issued: the next refresh fails, but until then any API validating tokens offline keeps accepting them. That gap is the **exposure window**.
 
-![The exposure window after revocation](images/06-revocation-gap.png)
+![The exposure window after revocation](/assets/post/2026/entra-token/06-revocation-gap.png)
 
-*[Download the editable draw.io version](images/06-revocation-gap.drawio)*
+<p style="text-align: center"><em>download the <a href="/assets/post/2026/entra-token/06-revocation-gap.drawio">draw.io source file</a></em></p>
 
 ### Shortening the window: token lifetime policies
 
@@ -136,9 +134,9 @@ A token lifetime policy sets `AccessTokenLifetime` (which also governs ID and SA
 
 CAE replaces the "wait for expiry" model with a conversation between Entra ID and the resource. CAE-enabled services subscribe to **critical events**: an account disabled or deleted, a password changed or reset, MFA enabled for the user, an admin revoking refresh tokens, or high user risk detected by ID Protection. They also enforce IP-based Conditional Access locations. When one occurs, the resource rejects even an unexpired token with a `401` and a **claims challenge**; the client goes back to Entra ID, which re-evaluates everything. Event propagation can take up to 15 minutes, while location enforcement is instant. Because revocation no longer depends on expiry, CAE-aware sessions get *long-lived* tokens (up to 28 hours), and token lifetime policies don't apply to them.
 
-![Continuous Access Evaluation](images/07-cae.png)
+![Continuous Access Evaluation](/assets/post/2026/entra-token/07-cae.png)
 
-*[Download the editable draw.io version](images/07-cae.drawio)*
+<p style="text-align: center"><em>download the <a href="/assets/post/2026/entra-token/07-cae.drawio">draw.io source file</a></em></p>
 
 > **Important: today CAE can't be used to protect your own APIs.**
 > The resource side of CAE—receiving Entra ID's critical events and rejecting tokens accordingly—is implemented only by Microsoft services: Exchange Online, SharePoint Online, Teams and Microsoft Graph. There's no documented way for a custom or third-party API to subscribe to those events, so it keeps validating tokens offline until they expire. CAE builds on the OpenID Continuous Access Evaluation Profile (CAEP), an open standard, but Entra ID doesn't currently offer third-party resources a supported way to consume it.
@@ -166,9 +164,9 @@ A tempting workaround—having your API call Microsoft Graph on the user's behal
 
 Authentication context lets an app apply stronger Conditional Access requirements to **specific operations** rather than to the whole app. An admin defines contexts (IDs `c1` to `c99`) and targets them with Conditional Access policies, for example "c2 → require MFA". The API maps its sensitive operations to a context and checks the `acrs` claim of the incoming token. If the context is missing, it returns `401` with a claims challenge asking for `acrs = c2`. The client sends the user back to Entra ID with that claims request, the policy prompts for MFA, and Entra ID issues a new token carrying `acrs: c2`.
 
-![Step-up with Conditional Access authentication context](images/08-auth-context-stepup.png)
+![Step-up with Conditional Access authentication context](/assets/post/2026/entra-token/08-auth-context-stepup.png)
 
-*[Download the editable draw.io version](images/08-auth-context-stepup.drawio)*
+<p style="text-align: center"><em>download the <a href="/assets/post/2026/entra-token/08-auth-context-stepup.drawio">draw.io source file</a></em></p>
 
 Things to know:
 
@@ -181,9 +179,9 @@ Things to know:
 
 A token lifetime policy is set per application, not per operation. To shorten it for critical operations only, move them into a **separate app registration**: one API for standard operations with the default lifetime, one for critical operations with a 10-minute policy plus an authentication context requiring MFA. The client gets a different token for each API, and users feel the stricter regime only for critical operations.
 
-![Separate app registrations for standard and critical operations](images/09-split-apps.png)
+![Separate app registrations for standard and critical operations](/assets/post/2026/entra-token/09-split-apps.png)
 
-*[Download the editable draw.io version](images/09-split-apps.drawio)*
+<p style="text-align: center"><em>download the <a href="/assets/post/2026/entra-token/09-split-apps.drawio">draw.io source file</a></em></p>
 
 For even fresher authentication, Conditional Access sign-in frequency set to **Every time**—or the **Every time strict** preview, designed for scenarios such as banking or e-prescribing—can require reauthentication when the app requests a new token for a sensitive action. It only works if the application's session logic actively requests that token, though: it doesn't make an already-issued access token single-use.
 
@@ -201,9 +199,9 @@ For even fresher authentication, Conditional Access sign-in frequency set to **E
 
 Standard OAuth 2.0 offers no way to "un-issue" a bearer token, and no Entra ID setting changes that for your own APIs. What you can do is make the residual risk small, explicit and proportionate:
 
-![Layered mitigations](images/10-defense-in-depth.png)
+![Layered mitigations](/assets/post/2026/entra-token/10-defense-in-depth.png)
 
-*[Download the editable draw.io version](images/10-defense-in-depth.drawio)*
+<p style="text-align: center"><em>download the <a href="/assets/post/2026/entra-token/10-defense-in-depth.drawio">draw.io source file</a></em></p>
 
 1. **Use OpenID Connect and OAuth 2.0 with Entra ID**, not home-grown cookies or Basic authentication.
 2. **Segment your APIs by risk:** reads on one side, operations that move money or change state on the other.
