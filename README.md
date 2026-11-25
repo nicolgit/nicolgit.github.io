@@ -16,6 +16,13 @@ Minimal Mistakes is a flexible two-column Jekyll theme, perfect for building per
 
 ![layout examples](screenshot-layouts.png)
 
+## Blog content width
+
+This blog overrides `#main` in `assets/css/main.scss` from the 1280px breakpoint,
+allowing standard content to grow up to 1000px within a 1636px container.
+Layouts below 1280px, sidebar widths, typography, header, and footer are unchanged.
+Wide layouts retain their existing use of the right-hand space.
+
 ## Notable features
 
 - Bundled as a "theme gem" for easier installation/upgrading.
