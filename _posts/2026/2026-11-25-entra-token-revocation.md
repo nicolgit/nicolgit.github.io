@@ -4,12 +4,14 @@ date: 2026-11-26 10:00
 tags: [Microsoft Entra ID, OAUTH2, OpenIDConnect, security, identity, Conditional Access, Azure]
 excerpt: "Why can't a stolen access token be revoked immediately? Explore token lifetimes in Microsoft Entra ID, the limits of Continuous Access Evaluation, and how shorter lifetimes and step-up authentication reduce the exposure window for your APIs."
 
+toc: true
+toc_sticky: true
 ---
 Sooner or later, every team building an application hears this question from security: *"If a user's token is stolen, how fast can we kill it?"* The answer depends on how authentication works and on which parts of the token lifecycle the identity provider controls.
 
 This post walks from Basic authentication to cookies to OpenID Connect and OAuth 2.0, then focuses on Microsoft Entra ID: token lifetimes, what revocation really does, and where Continuous Access Evaluation (CAE), Conditional Access and authentication context help—and where they stop.
 
-**A note on scope:** this isn't a complete guide to the protocols involved, their variants, exceptions or RFCs. Each section covers only what you need to understand the access-token problem and how Entra ID helps contain it. 
+> ⚠️this isn't a complete guide to the protocols involved, their variants, exceptions or RFCs. Each section covers only what you need to understand the access-token problem and how Entra ID helps contain it. 
 
 ## 1. Basic authentication
 
