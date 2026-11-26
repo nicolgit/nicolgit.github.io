@@ -132,3 +132,17 @@ Duis proident ullamco fugiat aliqua sunt anim ea do irure est amet quis nulla ci
 ## 6 Aliquip sunt laborum excepteur cupidatat officia ad tempor veniam esse amet ea commodo sunt
 
 Ex minim pariatur est nisi exercitation exercitation reprehenderit id aliqua deserunt est. Laborum ullamco do ipsum minim ipsum aliquip voluptate voluptate aliqua. Magna proident velit veniam et minim commodo officia officia mollit nisi. Excepteur occaecat deserunt irure adipisicing minim adipisicing cupidatat non anim exercitation ex. Amet quis sunt sint veniam non id nisi ipsum mollit voluptate quis tempor tempor.
+
+## Skipped heading levels
+
+#### Detail without an intermediate heading
+
+This jump from H2 to H4 must not close the root table of contents list.
+
+## Chapter after a skipped level
+
+###### Detail after multiple skipped levels
+
+### Returning to an intermediate level
+
+## Final chapter after skipped levels

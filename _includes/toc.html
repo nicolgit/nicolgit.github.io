@@ -141,7 +141,17 @@
         {% endif %}
 
         {% if currLevel > lastLevel and flatToc == false %}
-            {% capture jekyll_toc %}{{ jekyll_toc }}<{{ listModifier }}{{ subMenuClass }}>{% endcapture %}
+            {% assign repeatCount = currLevel | minus: lastLevel %}
+            {% if firstHeader %}
+                {% assign repeatCount = 1 %}
+            {% endif %}
+            {% comment %}Skipped heading levels need matching list wrappers before descending again.{% endcomment %}
+            {% for i in (1..repeatCount) %}
+                {% unless forloop.first %}
+                    {% capture jekyll_toc %}{{ jekyll_toc }}<li>{% endcapture %}
+                {% endunless %}
+                {% capture jekyll_toc %}{{ jekyll_toc }}<{{ listModifier }}{{ subMenuClass }}>{% endcapture %}
+            {% endfor %}
         {% elsif currLevel < lastLevel and flatToc == false %}
             {% assign repeatCount = lastLevel | minus: currLevel %}
 

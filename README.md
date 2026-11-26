@@ -23,6 +23,13 @@ allowing standard content to grow up to 1000px within a 1636px container.
 Layouts below 1280px, sidebar widths, typography, header, and footer are unchanged.
 Wide layouts retain their existing use of the right-hand space.
 
+## Blog table of contents
+
+Enable the right-hand index with `toc: true` and optionally `toc_sticky: true`
+in a post's front matter. The local `toc.html` include keeps list markup balanced
+when heading levels are skipped (for example, H2 to H4), so all chapters retain
+the table of contents styling.
+
 ## Notable features
 
 - Bundled as a "theme gem" for easier installation/upgrading.
