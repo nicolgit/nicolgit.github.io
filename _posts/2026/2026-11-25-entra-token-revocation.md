@@ -1,6 +1,6 @@
 ---
 title: Access Tokens Have No Undo Button - Lifetime, Revocation and Step-Up in Microsoft Entra ID
-date: 2026-11-26 10:00
+date: 2026-11-26 8:00
 tags: [Microsoft Entra ID, OAUTH2, OpenIDConnect, security, identity, Conditional Access, Azure]
 excerpt: "Why can't a stolen access token be revoked immediately? Explore token lifetimes in Microsoft Entra ID, the limits of Continuous Access Evaluation, and how shorter lifetimes and step-up authentication reduce the exposure window for your APIs."
 
