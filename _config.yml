@@ -114,7 +114,7 @@ analytics:
 author:
   name: "Nicola Delfino"
   avatar: "/assets/images/bio-photo.jpg"
-  bio: "I meet people, I do things for @Microsoft :). My opinions are my own, not the views of my employer and should NEVER be taken seriously."
+  bio: "I meet people, I do things for @Microsoft. My opinions are my own, not the views of my employer and should NEVER be taken seriously :)"
   location: "Italy"
   email: "nicola.delfino@outlook.com"
   uri:
@@ -138,9 +138,7 @@ author:
     - label: "Instagram"
       icon: "fab fa-fw fa-instagram"
       url: "https://instagram.com/nicolgramm"
-    - label: "Flickr"
-      icon: "fab fa-fw fa-flickr"
-      url: "https://flickr.com/photos/15216811@N06"
+
 
 # Site Footer
 footer:
